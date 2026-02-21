@@ -20,6 +20,7 @@ fi
 readonly LUKS_PASSWORD
 
 readonly -a PKGS=(
+	# base system
 	base
 	linux
 	linux-firmware
@@ -28,18 +29,22 @@ readonly -a PKGS=(
 	man-db
 	man-pages
 
+	# boot & disk
 	efibootmgr
 	btrfs-progs
 	cryptsetup
 
+	# networking
 	iwd
 	bind
 	inetutils
 
+	# bluetooth
 	bluez
 	bluez-utils
 	blueman
 
+	# shell & tools
 	neovim
 	git
 	wget
@@ -49,8 +54,8 @@ readonly -a PKGS=(
 	jq
 	bc
 	unzip
-	tree
 
+	# wayland & hyprland
 	hyprland
 	wayland
 	xdg-desktop-portal-hyprland
@@ -67,14 +72,17 @@ readonly -a PKGS=(
 	hyprpaper
 	polkit-gnome
 
+	# audio
 	pipewire
 	pipewire-pulse
 	wireplumber
 
+	# apps
 	ghostty
 	nautilus
 	brightnessctl
 
+	# fonts & media
 	ttf-jetbrains-mono
 	libcamera
 )
@@ -114,7 +122,7 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
-for script in disk chroot; do
+for script in disk chroot dotfiles; do
 	if [[ ! -f "scripts/${script}.sh" ]]; then
 		echo "[!] missing scripts/${script}.sh"
 		exit 1
@@ -132,6 +140,8 @@ pacstrap -K "$MNT" "${PKGS[@]}"
 genfstab -U "$MNT" >> "$MNT/etc/fstab"
 
 chroot_config
+
+dotfiles
 
 umount -R "$MNT"
 reboot
