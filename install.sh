@@ -141,7 +141,5 @@ genfstab -U "$MNT" >> "$MNT/etc/fstab"
 
 chroot_config
 
-dotfiles
-
 umount -R "$MNT"
 reboot
