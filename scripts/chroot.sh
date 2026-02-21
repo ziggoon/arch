@@ -57,11 +57,11 @@ chroot_config() {
 	systemctl enable iwd systemd-networkd systemd-resolved
 	ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-	echo "root:$PASSWORD" | chpasswd
+	chpasswd <<< "root:$PASSWORD"
 	useradd -m -G wheel -s /bin/bash "$USERNAME"
-	echo "$USERNAME:$PASSWORD" | chpasswd
-	sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
-
+	chpasswd <<< "$USERNAME:$PASSWORD"
+	sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
+	
 	runuser -u "$USERNAME" -- bash -c '
 	    cd /home/$USERNAME
 	    git clone https://aur.archlinux.org/yay.git
