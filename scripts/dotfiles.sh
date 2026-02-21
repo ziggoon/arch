@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
-USER_HOME="/home/$USERNAME"
+dotfiles() {
+	local user_home="/home/${USERNAME}"
+	local script_dir
+	script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-for dir in dotfiles/*/; do
-    name="$(basename "$dir")"
-    if [[ "$name" == "config" ]]; then
-        continue
-    fi
-    ln -sfn "$(realpath "$dir")" "${USER_HOME}/.config/${name}"
-done
+	mkdir -p "${user_home}/.config"
 
-ln -sf "$(realpath dotfiles/config/bashrc)" "${USER_HOME}/.bashrc"
+	local dir name
+	for dir in "${script_dir}"/dotfiles/*/; do
+		name="$(basename "$dir")"
+		[[ "$name" == "config" ]] && continue
+		ln -sfn "$(realpath "$dir")" "${user_home}/.config/${name}"
+	done
 
-chown -R "${USERNAME}:${USERNAME}" "${USER_HOME}"
+	# bashrc lives in home directory, not .config
+	ln -sf "$(realpath "${script_dir}/dotfiles/config/bashrc")" "${user_home}/.bashrc"
+
+	chown -R "${USERNAME}:${USERNAME}" "${user_home}"
+}
