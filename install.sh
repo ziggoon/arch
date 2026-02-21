@@ -140,7 +140,7 @@ pacstrap -K "$MNT" "${PKGS[@]}"
 genfstab -U "$MNT" >> "$MNT/etc/fstab"
 
 chroot_config
-dotfiles
+link_dotfiles
 
 umount -R "$MNT"
 reboot
