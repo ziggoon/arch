@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 partition() {
 	sgdisk --zap-all "$DISK"
@@ -8,8 +8,19 @@ partition() {
 }
 
 encrypt() {
-	echo -n "$LUKS_PASSWORD" | cryptsetup luksFormat --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --pbkdf argon2id "$PART_LUKS"
-	echo -n "$LUKS_PASSWORD" | cryptsetup open "$PART_LUKS" "$CRYPT_NAME"
+	echo -n "$LUKS_PASSWORD" | cryptsetup luksFormat \
+		--key-file=- \
+		--type luks2 \
+		--cipher aes-xts-plain64 \
+		--key-size 512 \
+		--hash sha512 \
+		--iter-time 5000 \
+		--pbkdf argon2id \
+		"$PART_LUKS"
+
+	echo -n "$LUKS_PASSWORD" | cryptsetup open \
+		--key-file=- \
+		"$PART_LUKS" "$CRYPT_NAME"
 }
 
 create_fs() {
@@ -20,25 +31,25 @@ create_fs() {
 create_subvolumes() {
 	mount "$CRYPT_DEVICE" "$MNT"
 
-    	local sv
-    	for sv in "${SUBVOLUMES[@]}"; do
-        	btrfs subvolume create "${MNT}/${sv}"
-    	done
+	local sv
+	for sv in "${SUBVOLUMES[@]}"; do
+		btrfs subvolume create "${MNT}/${sv}"
+	done
 
 	umount "$MNT"
 }
 
 mount_subvolumes() {
-    mount -o "subvol=@,${BTRFS_MOUNT_OPTS}" "$CRYPT_DEV" "$MNT"
+	mount -o "subvol=@,${BTRFS_MOUNT_OPTS}" "$CRYPT_DEVICE" "$MNT"
 
-    local sv mountpoint
-    for sv in "${SUBVOLUMES[@]}"; do
-        [[ "$sv" == "@" ]] && continue
-        mountpoint="${SUBVOL_MOUNT[$sv]}"
-        mkdir -p "$mountpoint"
-        mount -o "subvol=${sv},${BTRFS_MOUNT_OPTS}" "$CRYPT_DEVICE" "$mountpoint"
-    done
+	local sv mountpoint
+	for sv in "${SUBVOLUMES[@]}"; do
+		[[ "$sv" == "@" ]] && continue
+		mountpoint="${SUBVOL_MOUNT[$sv]}"
+		mkdir -p "$mountpoint"
+		mount -o "subvol=${sv},${BTRFS_MOUNT_OPTS}" "$CRYPT_DEVICE" "$mountpoint"
+	done
 
-    mkdir -p "${MNT}/boot"
-    mount "$PART_EFI" "${MNT}/boot"
+	mkdir -p "${MNT}/boot"
+	mount "$PART_EFI" "${MNT}/boot"
 }
