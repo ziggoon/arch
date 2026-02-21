@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
 dotfiles() {
-	local user_home="/home/${USERNAME}"
 	local script_dir
 	script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-	mkdir -p "${user_home}/.config"
+	# copy dotfiles into the installed system
+	cp -r "${script_dir}/dotfiles" "${MNT}/tmp/dotfiles"
 
-	local dir name
-	for dir in "${script_dir}"/dotfiles/*/; do
-		name="$(basename "$dir")"
-		[[ "$name" == "config" ]] && continue
-		ln -sfn "$(realpath "$dir")" "${user_home}/.config/${name}"
+	arch-chroot "$MNT" /bin/bash <<-DOTEOF
+	mkdir -p /home/${USERNAME}/.config
+
+	for dir in /tmp/dotfiles/*/; do
+	    name="\$(basename "\$dir")"
+	    [ "\$name" = "config" ] && continue
+	    cp -r "\$dir" "/home/${USERNAME}/.config/\$name"
 	done
 
-	# bashrc lives in home directory, not .config
-	ln -sf "$(realpath "${script_dir}/dotfiles/config/bashrc")" "${user_home}/.bashrc"
+	cp /tmp/dotfiles/config/bashrc /home/${USERNAME}/.bashrc
 
-	chown -R "${USERNAME}:${USERNAME}" "${user_home}"
+	chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
+	rm -rf /tmp/dotfiles
+	DOTEOF
 }
