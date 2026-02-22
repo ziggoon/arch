@@ -47,6 +47,8 @@ readonly -a PKGS=(
 	# shell & tools
 	neovim
 	git
+	github-cli
+	fastfetch
 	wget
 	curl
 	tmux
@@ -71,6 +73,7 @@ readonly -a PKGS=(
 	wl-clipboard
 	hyprpaper
 	polkit-gnome
+	nerd-fonts
 
 	# audio
 	pipewire
@@ -82,9 +85,12 @@ readonly -a PKGS=(
 	nautilus
 	brightnessctl
 
-	# fonts & media
-	ttf-jetbrains-mono
+	# media
 	libcamera
+)
+
+readonly -a AUR_PKGS=(
+	zen-browser-bin
 )
 
 if [[ "$DISK" == *nvme* ]]; then

@@ -54,7 +54,7 @@ chroot_config() {
 	DNS=8.8.8.8
 	NETWORK
 
-	systemctl enable iwd systemd-networkd systemd-resolved
+	systemctl enable iwd systemd-networkd systemd-resolved bluetooth
 	ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 	chpasswd <<< "root:$PASSWORD"
@@ -67,6 +67,9 @@ chroot_config() {
 	    git clone https://aur.archlinux.org/yay.git
 	    cd yay
 	    makepkg -si --noconfirm
+
+			yay -S $AUR_PKGS --noconfirm
 	'
+
 	CHROOTEOF
 }
