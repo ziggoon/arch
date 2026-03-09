@@ -24,10 +24,16 @@ readonly -a PKGS=(
 	base
 	linux
 	linux-firmware
+	linux-headers
+	dkms
+	sof-firmware
 	base-devel
 	sudo
 	man-db
 	man-pages
+	thermald 
+	tlp
+	lm_sensors
 
 	# boot & disk
 	efibootmgr
@@ -55,6 +61,7 @@ readonly -a PKGS=(
 	eza
 	jq
 	bc
+	zip
 	unzip
 
 	# wayland & hyprland
@@ -74,16 +81,23 @@ readonly -a PKGS=(
 	hyprpaper
 	polkit-gnome
 	nerd-fonts
+	ttf-jetbrains-mono
+	otf-font-awesome
+	hyprshot
+	mako
 
 	# audio
 	pipewire
 	pipewire-pulse
+	pipewire-alsa
 	wireplumber
+	pwvucontrol
 
 	# apps
 	ghostty
 	nautilus
 	brightnessctl
+	freerdp
 
 	# media
 	libcamera
@@ -91,6 +105,7 @@ readonly -a PKGS=(
 
 readonly -a AUR_PKGS=(
 	zen-browser-bin
+	evdi-dkms
 )
 
 if [[ "$DISK" == *nvme* ]]; then
